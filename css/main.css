@@ -94,19 +94,62 @@ textarea {
    ========================================================================== */
 
 
+html, body{
+   /* height:100%;*/
+}
+
  
-  body {
-    font: 10px sans-serif;
-  }
-  
-  .chord path {
+body {
+    /*font: 10px sans-serif;*/
+    overflow-y: scroll;
+    overflow: -moz-scrollbars-vertical;
+    background: none repeat scroll 0% 0% rgb(239, 236, 230);
+    font:21px/31px "Georgia";
+}
+
+.chord path {
     fill-opacity: .67;
     stroke: #000;
     stroke-width: .5px;
-  }
+}
 
+    
+h1,h2,h3,h4,h5,h6, nav{
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: lighter;
+}
 
+/*Standard sizes*/    
+h1{font-size:220%;}
+h2{font-size:200%;}
+h3{font-size:180%;}
+h4{font-size:160%;}
+h5{font-size:140%;}
+h6{font-size:120%;}
 
+a {color:#000;}      /* unvisited link */
+a:visited {color:#000;}  /* visited link */
+a:hover {color:#000;}  /* mouse over link */
+a:active {color:#000;}  /* selected link */
+
+a{text-decoration: none;}
+
+#divMain {
+    position:relative;
+    width:960px;
+    min-height:593px;
+    margin:0 auto;
+    background: none repeat scroll 0% 0% rgb(255, 255, 255);
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.23);
+    
+    border:5px solid gray;
+
+}
+
+.divMainPageContent{
+  padding:31px;
+    
+}
 
 /* ==========================================================================
    Helper classes
