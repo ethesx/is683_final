@@ -1,0 +1,11 @@
+{
+  "name": "final",
+  "description": "IS683 Final project Disease associations",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.2.0",
+    "mongodb": "~1.2.14",
+    "csv": "~0.2.9"
+  }
+}
