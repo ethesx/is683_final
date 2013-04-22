@@ -1,0 +1,9 @@
+disease, dlink_0, dlink_str_0, dlink_1, dlink_str_1, dlink_2, dlink_str_2,dlink_3, dlink_str_3,dlink_4, dlink_str_4,dlink_5, dlink_str_5,dlink_6, dlink_str_6,dlink_7, dlink_str_7,dlink_8, dlink_str_8,dlink_9, dlink_str_9
+Syphilis,Gonorrhea,20,Chlamydia,10,Chancroid,2,,,,,,,,,,,,,,
+Gonorrhea,Syphilis,20,Chlamydia,80,Chancroid,5,,,,,,,,,,,,,,
+Chlamydia,Syphilis,10,Gonorrhea,80,Chancroid,10,,,,,,,,,,,,,,
+Chancroid,Syphilis,2,Gonorrhea,5,Chlamydia,10,,,,,,,,,,,,,,
+Hepatitis B,Hepatitis C,200,Lyme,4,H1N1 (Swine Flu),20,,,,,,,,,,,,,,
+Hepatitis C,Hepatitis B,200,Lyme,10,H1N1 (Swine Flu),30,,,,,,,,,,,,,,
+H1N1 (Swine Flu),Hepatitis B,20,Lyme,50,Hepatitis C,30,,,,,,,,,,,,,,
+Lyme,Hepatitis B,4,Hepatitis C,10,H1N1 (Swine Flu),50,,,,,,,,,,,,,,
