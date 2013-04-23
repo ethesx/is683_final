@@ -64,6 +64,7 @@
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
         <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
@@ -167,6 +168,18 @@
             };
           }
         
+        </script>
+        <script>
+            // TODO
+            // Socket script. Move me later
+            
+            var socket = io.connect(window.location.href);
+	
+            socket.on('defaultData', function (data) {
+                    console.log('Returned data = ' + data);
+                    
+            });
+            
         </script>
     </body>
 </html>
