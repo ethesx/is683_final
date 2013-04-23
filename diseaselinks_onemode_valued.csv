@@ -1,0 +1,9 @@
+disease,Syphilis,Gonorrhea,Chlamydia,Chancroid,Hepatitis B,Hepatitis C,H1N1 (Swine Flu),Lyme
+Syphilis,0,20,10,2,0,2,0,0
+Gonorrhea,20,0,80,5,0,20,0,0
+Chlamydia,10,80,0,10,0,35,0,0
+Chancroid,2,5,10,0,0,5,0,0
+Hepatitis B,0,0,0,0,0,200,20,4
+Hepatitis C,2,20,35,5,200,0,30,10
+H1N1 (Swine Flu),0,0,0,0,20,30,0,50
+Lyme,0,0,0,0,4,10,50,0
