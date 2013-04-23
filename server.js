@@ -10,7 +10,8 @@ var records = [];
 
 csv(records)
    //.from.stream(fs.createReadStream(__dirname + '/contract.txt'), {
-   .from.stream(fs.createReadStream(__dirname + '/diseaselinks.csv'), {
+   //.from.stream(fs.createReadStream(__dirname + '/diseaselinks.csv'), {
+   .from.stream(fs.createReadStream(__dirname + '/diseaselinks_onemode_valued.csv'), {
    columns: true
 })
    .on('record', function (row, index) {
@@ -22,7 +23,7 @@ csv(records)
    var MongoClient = require('mongodb').MongoClient;
    // Connect to the db
    MongoClient.connect("mongodb://localhost:27017/final", function (err, db) {
-      var collection = db.collection('disease')
+      var collection = db.collection('disease_onemode')
       collection.insert(records, function (err, doc) {
          console.log(doc);
       });
