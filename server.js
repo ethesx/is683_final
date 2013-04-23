@@ -3,8 +3,10 @@ var express = require('express'),
    http = require('http'),
    csv = require('csv'),
    path = require('path');
-var records = new Array();
+   
 var app = express();
+
+var records = new Array();
 var records = [];
 
 
@@ -47,6 +49,17 @@ app.configure('development', function () {
 });
 
 
-http.createServer(app).listen(app.get('port'), function () {
+var server = http.createServer(app).listen(app.get('port'), function () {
    console.log("Express server listening on port " + app.get('port'));
+});
+
+var io = require('socket.io').listen(server);
+   
+   
+io.sockets.on('connection', function(socket){
+   socket.on('getData', function(){
+         console.log("Sending default data *************************");
+         socket.emit('defaultData', ({ "disease" : "Lyme", "Syphilis" : "0", "Gonorrhea" : "0", "Chlamydia" : "0", "Chancroid" : "0", "Hepatitis B" : "4", "Hepatitis C" : "10", "H1N1 (Swine Flu)" : "50", "Lyme" : "0"}));
+   
+   });
 });
