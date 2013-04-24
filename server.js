@@ -8,12 +8,14 @@ var app = express();
 
 var records = new Array();
 var records = [];
+var dataDir = "/data";
 
 
 csv(records)
-   //.from.stream(fs.createReadStream(__dirname + '/contract.txt'), {
-   //.from.stream(fs.createReadStream(__dirname + '/diseaselinks.csv'), {
-   .from.stream(fs.createReadStream(__dirname + '/diseaselinks_onemode_valued.csv'), {
+   //.from.stream(fs.createReadStream(__dirname + dataDir +'/contract.txt'), {
+   //.from.stream(fs.createReadStream(__dirname + dataDir +'/diseaselinks.csv'), {
+   //.from.stream(fs.createReadStream(__dirname + dataDir + '/diseaselinks_onemode_valued.csv'), {
+   .from.stream(fs.createReadStream(__dirname + dataDir + '/disease_association_by_node.csv'), {
    columns: true
 })
    .on('record', function (row, index) {
