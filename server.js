@@ -27,7 +27,7 @@ csv(records)
    var MongoClient = require('mongodb').MongoClient;
    // Connect to the db
    MongoClient.connect("mongodb://localhost:27017/final", function (err, db) {
-      var collection = db.collection('disease_onemode')
+      var collection = db.collection('disease_by_node')
       collection.insert(records, function (err, doc) {
          console.log(doc);
       });
