@@ -65,3 +65,32 @@ io.sockets.on('connection', function(socket){
    
    });
 });
+
+/*Migrate this sql to mongo
+ *
+ *SELECT disease, count(disease) cnt
+FROM disease_by_node
+WHERE PID IN
+  (
+    SELECT PID
+    FROM disease_by_node
+    WHERE disease = 'PERTUSSIS'
+  )
+AND disease <> 'PERTUSSIS'
+GROUP BY disease
+order by cnt desc;
+
+*/
+
+
+//Move to factory
+var mdb = require('mongodb').MongoClient;
+mdb.connect("mongodb://localhost:27017/final", function (err, db) {
+   var disease_by_node = db.collection('disease_by_node');
+   
+   var recs = disease_by_node.find({DISEASE : "PERTUSSIS"});
+   console.log("RETURNED RECORDS: **************************************" + recs);
+//iterate over rec results
+//db.disease_by_node.find({PID : "39481", DISEASE : {$ne: "PERTUSSIS"}}, {DISEASE:1});
+   });
+      
