@@ -198,6 +198,32 @@ a{text-decoration: none;}
 #eb{margin-top:40px;margin-bottom:80px;}
 
 
+svg {
+    font: 10px sans-serif;
+}
+.axis path, .axis line {
+    fill: none;
+    shape-rendering: crispedges;
+    stroke: #000000;
+} 
+#circle circle {
+  fill: none;
+  pointer-events: all;
+}
+
+.group path {
+  fill-opacity: .5;
+}
+
+path.chord {
+  stroke: #000;
+  stroke-width: .25px;
+}
+
+#circle:hover path.fade {
+  display: none;
+}
+
 /* ==========================================================================
    Helper classes
    ========================================================================== */
