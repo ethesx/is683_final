@@ -6,7 +6,7 @@ var express = require('express'),
    assert = require('assert');
    
 var app = express();
-
+var MongoClient = require('mongodb').MongoClient;
 
 
 var records = new Array();
@@ -14,16 +14,36 @@ var records = [];
 var dataDir = "/data";
 
 
-var errors = {
+var messages = {
    
-   db : {missingparams : "Please specify all parameters to create a connection.",
-         typenotsupported : "The DB type is not supported.",
+      errors: {
+         db : {
+            missingparams : "Please specify all parameters to create a connection.",
+            typenotsupported : "The DB type is not supported.",
+            connecterr : "Unable to establish connection to db",
+            openerr : "The following error occurred on open: ",
+            colerr : "The following error occurred on collection retrieval: ",
          }
+      },  
+      info : {
+         db: {
+            connected : "Connection successful.",
+            opened : "Open successful.",
+            
+         }
+         
+      }  
+};
+
+var mdbParams = {
+      dbName : "final",
+      dbColName : "disease_by_node"
    };
 
-//TODO move to js, use export, require. Check db closure, reopen
+
+//TODO move to js, use export, require.
 // Connect to the db
-var DbSingleton = (function(){
+var DBClientSingleton = (function(){
    
       var instance = {};
       var dbType = {
@@ -31,39 +51,39 @@ var DbSingleton = (function(){
          
          };
          
-      function privGetInstance(type, url, port, dbName){
+      function privGetInstance(type, url, port){
          
          for(k in arguments){
-            if(!arguments[k] || arguments[k] === null){
-               console.error(errors.db.missingparams);
-               break;
+            if(!arguments[k]){
+               console.error(messages.errors.db.missingparams);
+               return null;
             }
          }
  
          if(type === dbType.mongo.name){
             console.info("Trying " + dbType.mongo.name);
-            
-            var MongoClient = require('mongodb').MongoClient;
             var MongoServer = require('mongodb').Server;
-            
             var mclient = new MongoClient(new MongoServer(url, port, {auto_reconnect: true}))
-            mclient.open(function(){});
-            instance[dbType.mongo.name] = mclient.db(dbName);
+
+            if(mclient)
+               console.info(messages.info.db.connected);
+            else
+               console.info(messages.errors.db.connecterr);
+               
+            instance[dbType.mongo.name] = mclient;
             return instance[dbType.mongo.name];
          }
          else{
-            console.error(errors.db.typenotsupported);
+            console.error(messages.errors.db.typenotsupported);
             return null;
          }
       };
-      
-      
       return{
          
-         getInstance : function(type, url, port, db){
+         getInstance : function(type, url, port){
                 
                 if (!instance[type]){
-                  instance[type] = privGetInstance(type, url, port, db);
+                  instance[type] = privGetInstance(type, url, port);
                 }
 
                 return instance[type];
@@ -125,10 +145,62 @@ io.sockets.on('connection', function(socket){
 });
 
 
+MongoClient.prototype.runOp = function(func){
+   
+   var client = this;
+   
+   //Open a connection to the db
+   client.open(function(err, client){
+      
+         if(err)
+            console.error(messages.errors.db.openerr + err);
+         
+         //Choose the DB to use
+         var db = client.db(mdbParams.dbName);
+         
+         //Open the collection and perform the passed operation on it
+         db.collection(mdbParams.dbColName, function(err, col){
+            
+            if(err)
+               console.error(messages.errors.db.colerr);
+            
+            //Pass the collection to the query function, along with the client to close when done.
+            //Need to create extendable base class which handles callback, close implicitly
+            func(col, client);
 
-//TODO Move arguments to object
-var db = DbSingleton.getInstance("mongo", "localhost", 27017, "final");
-var collection = db.collection('disease_by_node');
+         });
 
-//TODO work with result set. Manipulate to JSON
-collection.find({PID : "39481", DISEASE : {$ne: "PERTUSSIS"}}, {DISEASE:1});
+   });
+   
+   
+};
+
+
+var createDataSet = function (collection, client){
+   
+
+   //Default disease list
+   var disAry = ["ADULT LEAD", "AMOEBIASIS", "BOTULISM", "HAEMOPHILUS INFLUENZAE - INVASIVE DISEASE", "HEPATITIS A", "SALMONELLOSIS - NON-TYPHOID (SALMONELLA SPP.)", "SHIGA TOXIN-PRODUCING E.COLI (STEC) - NON O157:H7", "VARICELLA (CHICKENPOX)"];
+   //var disAvailSet = collection.distinct({DISEASE : {$in : disAry}});
+   
+   var result = collection.find({DISEASE :  "AMOEBIASIS"});
+   
+   //console.log(result);
+   var items;
+   result.toArray(function(err, bson){
+
+       items = bson;
+       console.log(items);
+    });
+      
+   
+   console.log("************************DONE ***************************");
+   
+   client.close;
+
+}
+
+//TODO Move arguments to object, may need to use callback due to async
+
+var client = DBClientSingleton.getInstance("mongo", "localhost", 27017);
+client.runOp(createDataSet);
