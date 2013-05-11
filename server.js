@@ -171,25 +171,59 @@ var createDataSet = function (collection, client){
    })
       .on('end', function (count) {
          collection.insert(records, function (err, doc) {
-                  console.log(doc);
+                  //console.log(doc);
               });
          console.log('Number of lines: ' + count);
    });
 
    //Default disease list
    var disAry = ["ADULT LEAD", "AMOEBIASIS", "BOTULISM", "HAEMOPHILUS INFLUENZAE - INVASIVE DISEASE", "HEPATITIS A", "SALMONELLOSIS - NON-TYPHOID (SALMONELLA SPP.)", "SHIGA TOXIN-PRODUCING E.COLI (STEC) - NON O157:H7", "VARICELLA (CHICKENPOX)"];
-   //var disAvailSet = collection.distinct({DISEASE : {$in : disAry}});
+   /*
+   collection.distinct({DISEASE : {$in : disAry}}, function setAvailableDisease(err, docs){
+      
+         console.log(docs.sort());
+   });
+   */
    
-   var result = collection.find({DISEASE :  "AMOEBIASIS"});
+   //var result = collection.find({DISEASE :  "AMOEBIASIS"});
    
    //console.log(result);
+   /*
    var items;
    result.toArray(function(err, bson){
 
        items = bson;
        console.log(items);
     });
+     */
+   var disAvailAry = [];
+   
+
+   collection.aggregate([
+            {$match: {
+               DISEASE: {$in :disAry}
+               }
+            },
+           {$group:  {
+               _id :{DISEASE : "$DISEASE"}
+               }
+            }
+   ],function setAvailableDisease(err, docs){
       
+      if(err)
+         console.log("Error: " + err );
+      
+      docs.forEach(function(doc){
+         disAvailAry.push(doc._id.DISEASE);
+         });
+      
+      console.log(disAvailAry.length);
+      disAvailAry.sort();
+      console.log(disAvailAry);
+      console.log("**********************************");
+      
+   });
+
    
    console.log("************************DONE ***************************");
    
