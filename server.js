@@ -93,27 +93,6 @@ var DBClientSingleton = (function(){
    })();
 
 
-
-csv(records)
-   //.from.stream(fs.createReadStream(__dirname + dataDir +'/contract.txt'), {
-   //.from.stream(fs.createReadStream(__dirname + dataDir +'/diseaselinks.csv'), {
-   //.from.stream(fs.createReadStream(__dirname + dataDir + '/diseaselinks_onemode_valued.csv'), {
-   .from.stream(fs.createReadStream(__dirname + dataDir + '/disease_association_by_node.csv'), {
-   columns: true
-})
-   .on('record', function (row, index) {
-   records.push(row);
-
-   //console.log(row);
-})
-   .on('end', function (count) {
-      //collection.insert(records, function (err, doc) {
-               //console.log(doc);
-       //     });
-      console.log('Number of lines: ' + count);
-});
-
-
 app.configure(function () {
    app.set('port', process.env.PORT || 2600);
    app.use(express.favicon());
@@ -178,6 +157,24 @@ MongoClient.prototype.runOp = function(func){
 
 var createDataSet = function (collection, client){
    
+   csv(records)
+   //.from.stream(fs.createReadStream(__dirname + dataDir +'/contract.txt'), {
+   //.from.stream(fs.createReadStream(__dirname + dataDir +'/diseaselinks.csv'), {
+   //.from.stream(fs.createReadStream(__dirname + dataDir + '/diseaselinks_onemode_valued.csv'), {
+   .from.stream(fs.createReadStream(__dirname + dataDir + '/disease_association_by_node.csv'), {
+   columns: true
+   })
+      .on('record', function (row, index) {
+      records.push(row);
+   
+      //console.log(row);
+   })
+      .on('end', function (count) {
+         collection.insert(records, function (err, doc) {
+                  console.log(doc);
+              });
+         console.log('Number of lines: ' + count);
+   });
 
    //Default disease list
    var disAry = ["ADULT LEAD", "AMOEBIASIS", "BOTULISM", "HAEMOPHILUS INFLUENZAE - INVASIVE DISEASE", "HEPATITIS A", "SALMONELLOSIS - NON-TYPHOID (SALMONELLA SPP.)", "SHIGA TOXIN-PRODUCING E.COLI (STEC) - NON O157:H7", "VARICELLA (CHICKENPOX)"];
