@@ -154,9 +154,14 @@ MongoClient.prototype.runOp = function(func){
    
 };
 
+//Used to create default data for data array #kennebec stackoverflow
+Array.prototype.repeat= function(what, L){
+ while(L) this[--L]= what;
+ return this;
+}
 
 var createDataSet = function (collection, client){
-   
+  /* 
    csv(records)
    //.from.stream(fs.createReadStream(__dirname + dataDir +'/contract.txt'), {
    //.from.stream(fs.createReadStream(__dirname + dataDir +'/diseaselinks.csv'), {
@@ -170,35 +175,20 @@ var createDataSet = function (collection, client){
       //console.log(row);
    })
       .on('end', function (count) {
+         collection.drop();
          collection.insert(records, function (err, doc) {
                   //console.log(doc);
               });
          console.log('Number of lines: ' + count);
    });
-
+*/
+  
    //Default disease list
    var disAry = ["ADULT LEAD", "AMOEBIASIS", "BOTULISM", "HAEMOPHILUS INFLUENZAE - INVASIVE DISEASE", "HEPATITIS A", "SALMONELLOSIS - NON-TYPHOID (SALMONELLA SPP.)", "SHIGA TOXIN-PRODUCING E.COLI (STEC) - NON O157:H7", "VARICELLA (CHICKENPOX)"];
-   /*
-   collection.distinct({DISEASE : {$in : disAry}}, function setAvailableDisease(err, docs){
-      
-         console.log(docs.sort());
-   });
-   */
-   
-   //var result = collection.find({DISEASE :  "AMOEBIASIS"});
-   
-   //console.log(result);
-   /*
-   var items;
-   result.toArray(function(err, bson){
-
-       items = bson;
-       console.log(items);
-    });
-     */
    var disAvailAry = [];
+   var dataArray = [];
    
-
+   //Perform our initial query of diseases requested. Create array of those available.
    collection.aggregate([
             {$match: {
                DISEASE: {$in :disAry}
@@ -213,21 +203,100 @@ var createDataSet = function (collection, client){
       if(err)
          console.log("Error: " + err );
       
-      docs.forEach(function(doc){
+      docs.forEach(function setAvailDiseaseAry(doc){
          disAvailAry.push(doc._id.DISEASE);
          });
       
-      console.log(disAvailAry.length);
+      console.log("Diseases found: " + disAvailAry.length);
       disAvailAry.sort();
       console.log(disAvailAry);
-      console.log("**********************************");
       
-   });
+      
+      //Begin structuring our results
+      disAvailAry.forEach(function(disName){
+         var obj = {"disease" : {"name" : disName}, "data" : [].repeat(0, disAvailAry.length)};
+         dataArray.push(obj);
+         });
+      console.log(dataArray);
+      console.log("***************POPULATING DATA*******************");
+      
+      
+      var i = -1;
+      //LOOP over each disease in array
+      disAvailAry.forEach(function getDiseasePids(disease){
+         
+         //Select PIDs having this disease name
+         collection.aggregate(
+               
+               {$match: {
+                  "DISEASE": disease
+                  }
+               }
+               ,{$group: {_id :{PID : "$PID"}}}
+            , function (err, pids){
+                  
+                  if(err)
+                     console.log("Error: " + err );
+                  
+                  //console.log(pids);
+                  
+                  i++;//advance to the next data array object (next disease)
+                  //LOOP over PIDs array
+                  pids.forEach(function getDiseasesFromPid(pidDoc){
 
+                     var pid = pidDoc._id.PID;
+                     //console.log(pid);
+                     //Select PIDs having this disease name
+                     collection.aggregate(
+                           
+                           {$match: {
+                              "PID": pid, DISEASE: {$in :disAry}
+                              }
+                           },{$group: {_id :{DISEASE : "$DISEASE"}}}
+                        , function (err, docs){
+                           
+                              if(err)
+                                 console.log("Error: " + err );
+                                
+                                 docs.forEach(function setDiseaseData(doc){
+                                    
+                                    var docDisName = doc._id.DISEASE;
+                                    var currentDisObjectName = dataArray[i].disease.name;
+                                    /*
+                                    console.log("I = " + i);
+                                    console.log(docDisName);
+                                    console.log(disObjectName);
+                                    console.log("************************************************");
+                                    */
+
+                                    //TODO investigate bug, results inconsistent. async issue?
+                                    if(currentDisObjectName !== docDisName){
+                                       dataArray[i].data.forEach(function setThisDiseaseData(element, index, array){
+                                          
+                                         // console.log(dataArray[index].disease.name);
+                                         // console.log(index);
+                                          
+                                          //Does the current document disease name match this data index's name?
+                                          if(dataArray[index].disease.name === docDisName){
+
+                                             array[index]++;
+                  
+                                          }
+                                       
+                                       });
+                                    }
+                                 }); 
+                           });    
+                  });
+            });
+         });
+      setTimeout(function(){console.log(dataArray)}, 2000);
+   });
+   
    
    console.log("************************DONE ***************************");
    
-   client.close;
+   //client.close;
 
 }
 
