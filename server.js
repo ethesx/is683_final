@@ -12,7 +12,7 @@ var MongoClient = require('mongodb').MongoClient;
 var records = new Array();
 var records = [];
 var dataDir = "/data";
-
+var dataArray = [];
 
 var messages = {
    
@@ -117,9 +117,15 @@ var io = require('socket.io').listen(server);
    
 io.sockets.on('connection', function(socket){
    socket.on('getData', function(){
-         console.log("Sending default data *************************");
+         //console.log("Sending default data *************************");
          //socket.emit('defaultData', ({ "disease" : "Lyme", "Syphilis" : "0", "Gonorrhea" : "0", "Chlamydia" : "0", "Chancroid" : "0", "Hepatitis B" : "4", "Hepatitis C" : "10", "H1N1 (Swine Flu)" : "50", "Lyme" : "0"}));
-   
+      //TODO Move arguments to object, may need to use callback due to async
+
+         
+         client.runOp(createDataSet);
+
+         setTimeout(function(){socket.emit('defaultData', dataArray);}, 500);
+         
    });
 });
 
@@ -186,7 +192,7 @@ var createDataSet = function (collection, client){
    //Default disease list
    var disAry = ["ADULT LEAD", "AMOEBIASIS", "BOTULISM", "HAEMOPHILUS INFLUENZAE - INVASIVE DISEASE", "HEPATITIS A", "SALMONELLOSIS - NON-TYPHOID (SALMONELLA SPP.)", "SHIGA TOXIN-PRODUCING E.COLI (STEC) - NON O157:H7", "VARICELLA (CHICKENPOX)"];
    var disAvailAry = [];
-   var dataArray = [];
+   //var dataArray = [];
    
    //Perform our initial query of diseases requested. Create array of those available.
    collection.aggregate([
@@ -214,10 +220,10 @@ var createDataSet = function (collection, client){
       
       //Begin structuring our results
       disAvailAry.forEach(function(disName){
-         var obj = {"disease" : {"name" : disName}, "data" : [].repeat(0, disAvailAry.length)};
+         var obj = {"disease" : {"name" : disName, "data" : [].repeat(0, disAvailAry.length)}};
          dataArray.push(obj);
          });
-      //console.log(dataArray);
+      console.log(dataArray);
       console.log("***************POPULATING DATA*******************");
       
       
@@ -271,7 +277,7 @@ var createDataSet = function (collection, client){
 
                                     //TODO investigate bug, results inconsistent. async issue?
                                     if(currentDisObjectName !== docDisName){
-                                       dataArray[i].data.forEach(function setThisDiseaseData(element, index, array){
+                                       dataArray[i].disease.data.forEach(function setThisDiseaseData(element, index, array){
                                           
                                          // console.log(dataArray[index].disease.name);
                                          // console.log(index);
@@ -290,17 +296,11 @@ var createDataSet = function (collection, client){
                   });
             });
          });
-      setTimeout(function(){console.log(dataArray)}, 500);
+      setTimeout(function(){console.log(dataArray);}, 500);
    });
-   
-   
-   console.log("************************DONE ***************************");
    
    //client.close;
 
 }
 
-//TODO Move arguments to object, may need to use callback due to async
-
-var client = DBClientSingleton.getInstance("mongo", "localhost", 27017);
-client.runOp(createDataSet);
+var client = new DBClientSingleton.getInstance("mongo", "localhost", 27017);
