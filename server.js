@@ -217,7 +217,7 @@ var createDataSet = function (collection, client){
          var obj = {"disease" : {"name" : disName}, "data" : [].repeat(0, disAvailAry.length)};
          dataArray.push(obj);
          });
-      console.log(dataArray);
+      //console.log(dataArray);
       console.log("***************POPULATING DATA*******************");
       
       
@@ -290,7 +290,7 @@ var createDataSet = function (collection, client){
                   });
             });
          });
-      setTimeout(function(){console.log(dataArray)}, 2000);
+      setTimeout(function(){console.log(dataArray)}, 500);
    });
    
    
